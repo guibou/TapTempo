@@ -11,7 +11,8 @@ type DefaultResetTime = 5
 type MaxPrecision = 5
 
 -- runtime value, this is ugly
-defaultResetTime = natVal (Proxy :: Proxy DefaultResetTime)
-defaultSampleSize = natVal (Proxy :: Proxy DefaultSampleSize)
-defaultPrecision = natVal (Proxy :: Proxy DefaultPrecision)
-maxPrecision = natVal (Proxy :: Proxy MaxPrecision)
+defaultResetTime, defaultSampleSize, defaultPrecision, maxPrecision :: Int
+defaultResetTime = fromInteger $ natVal (Proxy :: Proxy DefaultResetTime)
+defaultSampleSize = fromInteger $ natVal (Proxy :: Proxy DefaultSampleSize)
+defaultPrecision = fromInteger $ natVal (Proxy :: Proxy DefaultPrecision)
+maxPrecision = fromInteger $ natVal (Proxy :: Proxy MaxPrecision)
