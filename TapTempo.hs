@@ -10,8 +10,8 @@ import Default
 -- | Runtime configuration of Tap Tempo
 data Config = Config
   { precision :: Refined (FromTo 0 MaxPrecision) Integer
-  , resetTime :: Refined NonNegative Integer
-  , sampleSize :: Refined NonNegative Integer
+  , resetTime :: Refined (From 1) Integer
+  , sampleSize :: Refined (From 1) Integer
   }
   deriving (Show)
 
@@ -30,15 +30,15 @@ sample = Config
          <> short 'r'
          <> help "changer le temps en seconde de remise à zéro du calcul."
          <> showDefaultWith (\x -> show (unrefine x))
-         <> value (($$(refineTH defaultResetTime)) :: Refined NonNegative Integer)
-         <> metavar "(FLOAT>=0)" )
+         <> value (($$(refineTH defaultResetTime)) :: Refined (From 1) Integer)
+         <> metavar "(INT>0)" )
       <*> option (eitherReader (\x -> refine =<< readEither x))
           ( long "sample-size"
          <> short 's'
          <> help "changer le nombre d'échantillons nécessaires au calcul du tempo."
          <> showDefaultWith (\x -> show (unrefine x))
-         <> value (($$(refineTH defaultSampleSize)) :: Refined NonNegative Integer)
-         <> metavar "(INT>=0)" )
+         <> value (($$(refineTH defaultSampleSize)) :: Refined (From 1) Integer)
+         <> metavar "(INT>0)" )
 
 
 main :: IO ()
