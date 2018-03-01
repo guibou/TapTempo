@@ -8,16 +8,8 @@ import Refined
 import System.Clock
 import qualified System.IO as IO
 
-import Default
+import Model
 import I18N
-
--- | Runtime configuration of Tap Tempo
-data Config = Config
-  { precision :: RefinedPrecision -- ^ number of digits used to display the bmp
-  , resetTime :: RefinedResetTime -- ^ time, in second before discarding samples
-  , sampleSize :: RefinedSampleSize -- ^ size of the sliding window of samples
-  }
-  deriving (Show)
 
 -- | The main loop
 tapTempo :: Config -> IO ()

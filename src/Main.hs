@@ -7,7 +7,7 @@ import Text.Read (readEither)
 import Refined
 
 import Version (versionString)
-import Default
+import Model
 import I18N
 
 import TapTempo
