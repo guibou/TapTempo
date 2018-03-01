@@ -13,9 +13,9 @@ import I18N
 
 -- | Runtime configuration of Tap Tempo
 data Config = Config
-  { precision :: Refined (FromTo 0 MaxPrecision) Int -- ^ number of digits used to display the bmp
-  , resetTime :: Refined Positive Int -- ^ time, in second before discarding samples
-  , sampleSize :: Refined Positive Int -- ^ size of the sliding window of samples
+  { precision :: RefinedPrecision -- ^ number of digits used to display the bmp
+  , resetTime :: RefinedResetTime -- ^ time, in second before discarding samples
+  , sampleSize :: RefinedSampleSize -- ^ size of the sliding window of samples
   }
   deriving (Show)
 

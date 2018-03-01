@@ -19,7 +19,7 @@ options = Config
          <> short 'p'
          <> help (message MsgCLIHelpPrecision)
          <> showDefaultWith (\x -> show (unrefine x))
-         <> value (($$(refineTH defaultPrecision)) :: Refined (FromTo 0 MaxPrecision) Int)
+         <> value defaultPrecision
          <> metavar ("(0.." ++ show maxPrecision ++ ")")
           )
       <*> option (eitherReader (\x -> refine =<< readEither x))
@@ -27,14 +27,14 @@ options = Config
          <> short 'r'
          <> help (message MsgCLIHelpResetTime)
          <> showDefaultWith (\x -> show (unrefine x))
-         <> value (($$(refineTH defaultResetTime)) :: Refined Positive Int)
+         <> value defaultResetTime
          <> metavar "(INT>0)" )
       <*> option (eitherReader (\x -> refine =<< readEither x))
           ( long "sample-size"
          <> short 's'
          <> help (message MsgCLIHelpSampleSize)
          <> showDefaultWith (\x -> show (unrefine x))
-         <> value (($$(refineTH defaultSampleSize)) :: Refined Positive Int)
+         <> value defaultSampleSize
          <> metavar "(INT>0)" )
 
 versionBanner :: String
