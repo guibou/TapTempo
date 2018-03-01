@@ -50,24 +50,32 @@ tapTempo config = do
         Ret -> do
           t <- getTime Monotonic
 
-          let t' = t:if resetTimeTooOld (resetTime config) t samples
-                     then []
-                     else samples
+          let samples' = clipNumberOfSamples (sampleSize config) (clipOldSamples (resetTime config) (t:samples))
 
-          if length t' <= 1
-            then putStrLn (message (MsgHitMore))
-            else do
-              let bpm = computeBPM t'
-              putStrLn (message (MsgTempo bpm (unrefine $ precision config)))
-          go (take (unrefine (sampleSize config)) t')
+          case computeBPM samples' of
+            Nothing -> putStrLn (message (MsgHitMore))
+            Just bpm -> putStrLn (message (MsgTempo bpm (unrefine $ precision config)))
+          go samples'
 
-computeBPM :: [TimeSpec] -> Float
-computeBPM l = bpm
+-- | If possible, returns the beat per minutes of this sample sequence
+computeBPM :: [TimeSpec] -> Maybe Float
+computeBPM l
+  | length l < 2 = Nothing
+  | otherwise = Just bpm
   where
     elapsedTime = toNanoSecs (diffTimeSpec (head l) (last l))
     meanTime = elapsedTime `div` (fromIntegral (length l))
     bpm = 60 / (fromInteger (meanTime) / (10 ^ 9))
 
-resetTimeTooOld :: Refined Positive Int -> TimeSpec -> [TimeSpec] -> Bool
-resetTimeTooOld _ _ [] = False
-resetTimeTooOld bound t0 (t1:_) = (sec (diffTimeSpec t0 t1)) > (fromIntegral $ unrefine bound)
+-- | Drop samples which are too old
+clipOldSamples :: Refined Positive Int -> [TimeSpec] -> [TimeSpec]
+clipOldSamples limit (x:y:_)
+  | tooOld limit x y = [x]
+clipOldSamples _ l = l
+
+-- | Limit the sliding window size
+clipNumberOfSamples :: Refined Positive Int -> [TimeSpec] -> [TimeSpec]
+clipNumberOfSamples limit = take (unrefine limit)
+
+tooOld :: Refined Positive Int -> TimeSpec -> TimeSpec -> Bool
+tooOld limit a b = sec (diffTimeSpec a b) > (fromIntegral (unrefine limit))
