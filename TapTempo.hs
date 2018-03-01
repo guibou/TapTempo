@@ -41,14 +41,14 @@ tapTempo config = do
   go []
 
   where
-    go :: [Integer] -> IO ()
+    go :: [TimeSpec] -> IO ()
     go samples = do
       c <- readAction
 
       case c of
         Quit -> putStrLn (message (MsgGoodBye))
         Ret -> do
-          t <- toNanoSecs <$> getTime Monotonic
+          t <- getTime Monotonic
 
           let t' = t:if resetTimeTooOld (resetTime config) t samples
                      then []
@@ -61,13 +61,13 @@ tapTempo config = do
               putStrLn (message (MsgTempo bpm (unrefine $ precision config)))
           go (take (unrefine (sampleSize config)) t')
 
-computeBPM :: [Integer] -> Float
+computeBPM :: [TimeSpec] -> Float
 computeBPM l = bpm
   where
-    elapsedTime = head l - last l
+    elapsedTime = toNanoSecs (diffTimeSpec (head l) (last l))
     meanTime = elapsedTime `div` (fromIntegral (length l))
     bpm = 60 / (fromInteger (meanTime) / (10 ^ 9))
 
-resetTimeTooOld :: Refined Positive Int -> Integer -> [Integer] -> Bool
+resetTimeTooOld :: Refined Positive Int -> TimeSpec -> [TimeSpec] -> Bool
 resetTimeTooOld _ _ [] = False
-resetTimeTooOld bound t0 (t1:_) = abs (t0 - t1) > (fromIntegral $ unrefine bound) * 10 ^ 9
+resetTimeTooOld bound t0 (t1:_) = (sec (diffTimeSpec t0 t1)) > (fromIntegral $ unrefine bound)
