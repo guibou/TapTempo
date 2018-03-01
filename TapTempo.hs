@@ -19,13 +19,20 @@ data Config = Config
   }
   deriving (Show)
 
-getRetOrQuit :: IO Char
-getRetOrQuit = do
-  c <- getChar
-  if c == '\n' || c == 'q'
-    then pure c
-    else getRetOrQuit
+-- | Current Status of command line reading
+data Action = Ret | Quit
+  deriving (Show)
 
+-- | repetivly read a char on stdin until it match an action
+readAction :: IO Action
+readAction = do
+  c <- getChar
+  case c of
+    '\n' -> pure Ret
+    'q' -> pure Quit
+    _ -> readAction
+
+-- | The main loop
 tapTempo :: Config -> IO ()
 tapTempo config = do
   putStrLn (message MsgHello)
@@ -36,11 +43,11 @@ tapTempo config = do
   where
     go :: [Integer] -> IO ()
     go samples = do
-      c <- getRetOrQuit
+      c <- readAction
 
       case c of
-        'q' -> putStrLn (message (MsgGoodBye))
-        '\n' -> do
+        Quit -> putStrLn (message (MsgGoodBye))
+        Ret -> do
           t <- toNanoSecs <$> getTime Monotonic
 
           let t' = t:if resetTimeTooOld (resetTime config) t samples
