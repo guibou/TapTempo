@@ -4,11 +4,25 @@ import Data.Semigroup ((<>))
 import Text.Read (readEither)
 import Refined
 import System.Clock
-import System.IO
-import Formatting
+import qualified System.IO as IO
 
 import Version (versionString)
 import Default
+import I18N
+
+import Prelude hiding (putStrLn, putStr)
+import Data.Text.IO (putStrLn, putStr)
+
+-- TODO:
+{-
+   Localisation:
+         - les champs par défaut de optparse-applicative ("Usage", "Available options")
+         - les "default" de optparse-applicative
+         - les messages d'erreurs de optparse-applicative
+         - les messages d'erreurs de refined
+   Localisation:
+         - Detecter la locale système
+-}
 
 -- | Runtime configuration of Tap Tempo
 data Config = Config
@@ -23,7 +37,7 @@ sample = Config
       <$> option (eitherReader (\x -> refine =<< readEither x))
           ( long "precision"
          <> short 'p'
-         <> help "changer le nombre de décimale du tempo à afficher."
+         <> help (messageS MsgCLIHelpPrecision)
          <> showDefaultWith (\x -> show (unrefine x))
          <> value (($$(refineTH defaultPrecision)) :: Refined (FromTo 0 MaxPrecision) Int)
          <> metavar ("(0.." ++ show maxPrecision ++ ")")
@@ -31,14 +45,14 @@ sample = Config
       <*> option (eitherReader (\x -> refine =<< readEither x))
           ( long "reset-time"
          <> short 'r'
-         <> help "changer le temps en seconde de remise à zéro du calcul."
+         <> help (messageS MsgCLIHelpResetTime)
          <> showDefaultWith (\x -> show (unrefine x))
          <> value (($$(refineTH defaultResetTime)) :: Refined Positive Int)
          <> metavar "(INT>0)" )
       <*> option (eitherReader (\x -> refine =<< readEither x))
           ( long "sample-size"
          <> short 's'
-         <> help "changer le nombre d'échantillons nécessaires au calcul du tempo."
+         <> help (messageS MsgCLIHelpSampleSize)
          <> showDefaultWith (\x -> show (unrefine x))
          <> value (($$(refineTH defaultSampleSize)) :: Refined Positive Int)
          <> metavar "(INT>0)" )
@@ -51,13 +65,21 @@ main = do
   where
     opts = info (sample <**> helper <**> version)
       ( fullDesc
-     <> progDesc "Print a greeting for TARGET"
-     <> header "hello - a test for optparse-applicative" )
+     <> progDesc (messageS MsgCLIDescription)
+     <> header (messageS MsgCLIHeader)
+      )
 
-version = infoOption versionBanner ( long "version"
-                                     <> short 'v'
-                                     <> help "Show the version number")
+    helper = abortOption ShowHelpText (  long "help"
+                                    <> short 'h'
+                                    <> help (messageS MsgCLIHelp)
+                                    )
 
+    version :: Parser (a -> a)
+    version = infoOption versionBanner ( long "version"
+                                        <> short 'v'
+                                        <> help (messageS MsgCLIVersion))
+
+versionBanner :: String
 versionBanner = unlines [
   "Tap Tempo " ++ $(versionString)
   ,"Copyright (C) 2018 Guillaume Bouchard"
@@ -74,8 +96,8 @@ getRetOrQuit = do
 
 tapTempo :: Config -> IO ()
 tapTempo config = do
-  putStrLn "Appuyer sur la touche entrée en cadence (q pour quitter)."
-  hSetBuffering stdin NoBuffering
+  putStrLn (message MsgHello)
+  IO.hSetBuffering IO.stdin IO.NoBuffering
 
   go []
 
@@ -85,7 +107,7 @@ tapTempo config = do
       c <- getRetOrQuit
 
       case c of
-        'q' -> putStrLn "Bye Bye"
+        'q' -> putStrLn (message (MsgGoodBye))
         '\n' -> do
           t <- toNanoSecs <$> getTime Monotonic
 
@@ -93,12 +115,12 @@ tapTempo config = do
                      then []
                      else samples
 
-          putChar '\r'
+          putStrLn ""
           if length t' <= 1
-            then putStr "[Hit enter key one more time to start bpm computation...]"
+            then putStrLn (message (MsgHitMore))
             else do
               let bpm = computeBPM t'
-              putStr (formatToString ("Tempo:" % fixed (unrefine $ precision config) % " bpm\t") bpm)
+              putStr (message (MsgTempo bpm (unrefine $ precision config)))
           go (take (unrefine (sampleSize config)) t')
 
 computeBPM :: [Integer] -> Float
