@@ -10,6 +10,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ myghc git ];
 
   buildPhase = ''
+    cd src
     ghc -O2 -Wall Main.hs
 
     mkdir -p $out/bin
