@@ -11,8 +11,10 @@ import System.IO.Unsafe
 
 data TapTempo = TapTempo
 
+-- This automatically generate the TapTempoMessage based on .msg files
 mkMessage "TapTempo" "messages/" ("en")
 
+message :: TapTempoMessage -> String
 message m = Text.unpack (renderMessage TapTempo [unsafeCurrentLocale] m)
 
 showBpm :: Int -> Float -> String
