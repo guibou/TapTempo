@@ -13,25 +13,20 @@ data Config = Config
   }
   deriving (Show)
 
--- type level value
-type DefaultPrecision = 0
-type DefaultSampleSize = 5
-type DefaultResetTime = 5
 type MaxPrecision = 5
-
 type RefinedPrecision = Refined (FromTo 0 MaxPrecision) Int
 type RefinedResetTime = Refined Positive Int
 type RefinedSampleSize = Refined Positive Int
 
--- runtime value, this is ugly
+-- runtime value
 defaultResetTime :: RefinedResetTime
-defaultResetTime = $$(refineTH (fromInteger $ natVal (Proxy :: Proxy DefaultResetTime)))
+defaultResetTime = $$(refineTH 5)
 
 defaultSampleSize :: RefinedSampleSize
-defaultSampleSize = $$(refineTH (fromInteger $ natVal (Proxy :: Proxy DefaultSampleSize)))
+defaultSampleSize = $$(refineTH 5)
 
 defaultPrecision :: RefinedPrecision
-defaultPrecision = $$(refineTH (fromInteger (natVal (Proxy :: Proxy DefaultPrecision))))
+defaultPrecision = $$(refineTH 0)
 
 maxPrecision :: Int
 maxPrecision = fromInteger (natVal (Proxy :: Proxy MaxPrecision))
