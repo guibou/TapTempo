@@ -11,8 +11,8 @@ import qualified System.IO as IO
 import Default
 import I18N
 
-import Prelude hiding (putStrLn, putStr)
-import Data.Text.IO (putStrLn, putStr)
+import Prelude hiding (putStrLn)
+import Data.Text.IO (putStrLn)
 
 -- | Runtime configuration of Tap Tempo
 data Config = Config
@@ -22,6 +22,7 @@ data Config = Config
   }
   deriving (Show)
 
+getRetOrQuit :: IO Char
 getRetOrQuit = do
   c <- getChar
   if c == '\n' || c == 'q'
