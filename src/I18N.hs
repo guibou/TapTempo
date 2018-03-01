@@ -23,11 +23,11 @@ showBpm precision bpm = Formatting.formatToString (Formatting.fixed precision) b
 -- | The local currently in use by the system
 --   This value is unsafe if your system local suddently changes
 unsafeCurrentLocale :: Text.Text
-unsafeCurrentLocale = unsafePerformIO getCurrentLocal
+unsafeCurrentLocale = unsafePerformIO getCurrentLocale
 
 -- | Read the current local
-getCurrentLocal :: IO Text.Text
-getCurrentLocal = do
+getCurrentLocale :: IO Text.Text
+getCurrentLocale = do
   -- I don't know what I'm doing...
   locale <- lookupEnv "LANG"
   case locale of
