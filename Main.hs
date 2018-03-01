@@ -17,7 +17,7 @@ options = Config
       <$> option (eitherReader (\x -> refine =<< readEither x))
           ( long "precision"
          <> short 'p'
-         <> help (messageS MsgCLIHelpPrecision)
+         <> help (message MsgCLIHelpPrecision)
          <> showDefaultWith (\x -> show (unrefine x))
          <> value (($$(refineTH defaultPrecision)) :: Refined (FromTo 0 MaxPrecision) Int)
          <> metavar ("(0.." ++ show maxPrecision ++ ")")
@@ -25,14 +25,14 @@ options = Config
       <*> option (eitherReader (\x -> refine =<< readEither x))
           ( long "reset-time"
          <> short 'r'
-         <> help (messageS MsgCLIHelpResetTime)
+         <> help (message MsgCLIHelpResetTime)
          <> showDefaultWith (\x -> show (unrefine x))
          <> value (($$(refineTH defaultResetTime)) :: Refined Positive Int)
          <> metavar "(INT>0)" )
       <*> option (eitherReader (\x -> refine =<< readEither x))
           ( long "sample-size"
          <> short 's'
-         <> help (messageS MsgCLIHelpSampleSize)
+         <> help (message MsgCLIHelpSampleSize)
          <> showDefaultWith (\x -> show (unrefine x))
          <> value (($$(refineTH defaultSampleSize)) :: Refined Positive Int)
          <> metavar "(INT>0)" )
@@ -52,13 +52,13 @@ main = execParser opts >>= tapTempo
   where
     opts = info (options <**> helpOption <**> version)
       ( fullDesc
-        <> progDesc (messageS MsgCLIDescription)
-        <> header (messageS MsgCLIHeader))
+        <> progDesc (message MsgCLIDescription)
+        <> header (message MsgCLIHeader))
 
     helpOption = abortOption ShowHelpText ( long "help"
                                             <> short 'h'
-                                            <> help (messageS MsgCLIHelp))
+                                            <> help (message MsgCLIHelp))
 
     version = infoOption versionBanner ( long "version"
                                          <> short 'v'
-                                         <> help (messageS MsgCLIVersion))
+                                         <> help (message MsgCLIVersion))

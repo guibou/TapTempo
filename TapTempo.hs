@@ -11,9 +11,6 @@ import qualified System.IO as IO
 import Default
 import I18N
 
-import Prelude hiding (putStrLn)
-import Data.Text.IO (putStrLn)
-
 -- | Runtime configuration of Tap Tempo
 data Config = Config
   { precision :: Refined (FromTo 0 MaxPrecision) Int -- ^ number of digits used to display the bmp
