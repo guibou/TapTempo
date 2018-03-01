@@ -62,7 +62,7 @@ computeBPM l
   where
     elapsedTime = toNanoSecs (diffTimeSpec (head l) (last l))
     meanTime = elapsedTime `div` (fromIntegral (length l))
-    bpm = 60 / (fromInteger (meanTime) / (10 ^ 9))
+    bpm = 60 / (fromInteger (meanTime) / (10 ^ (9 :: Integer)))
 
 -- | Drop samples which are too old
 clipOldSamples :: Refined Positive Int -> [TimeSpec] -> [TimeSpec]
