@@ -20,8 +20,6 @@ import Data.Text.IO (putStrLn, putStr)
          - les "default" de optparse-applicative
          - les messages d'erreurs de optparse-applicative
          - les messages d'erreurs de refined
-   Localisation:
-         - Detecter la locale système
 -}
 
 -- | Runtime configuration of Tap Tempo
