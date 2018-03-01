@@ -49,12 +49,11 @@ tapTempo config = do
                      then []
                      else samples
 
-          putStrLn ""
           if length t' <= 1
             then putStrLn (message (MsgHitMore))
             else do
               let bpm = computeBPM t'
-              putStr (message (MsgTempo bpm (unrefine $ precision config)))
+              putStrLn (message (MsgTempo bpm (unrefine $ precision config)))
           go (take (unrefine (sampleSize config)) t')
 
 computeBPM :: [Integer] -> Float
