@@ -7,6 +7,17 @@ Haskell implementation of [https://github.com/moleculext/taptempo](taptempo). It
 
 Run it, press the `<Enter>` key, and see the beat per minute.
 
+# Build / Usage / Install
+
+Build using [nix](https://nixos.org/nix/) so:
+
+```
+$ nix-build
+$ ./result/bin/TapTempo --help
+```
+
+Open a pull request if you want `cabal` / `stack` build script.
+
 # Limitations
 
 The current localisation includes English and French, however some items are not correctly localised:
