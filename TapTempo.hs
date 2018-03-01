@@ -19,19 +19,6 @@ data Config = Config
   }
   deriving (Show)
 
--- | Current Status of command line reading
-data Action = Ret | Quit
-  deriving (Show)
-
--- | repetivly read a char on stdin until it match an action
-readAction :: IO Action
-readAction = do
-  c <- getChar
-  case c of
-    '\n' -> pure Ret
-    'q' -> pure Quit
-    _ -> readAction
-
 -- | The main loop
 tapTempo :: Config -> IO ()
 tapTempo config = do
@@ -39,23 +26,33 @@ tapTempo config = do
   IO.hSetBuffering IO.stdin IO.NoBuffering
 
   go []
+  -- in case of any exception, the buffering stays to NoBuffering. I
+  -- don't like that.
+
+  putStrLn (message (MsgGoodBye))
 
   where
     go :: [TimeSpec] -> IO ()
-    go samples = do
-      c <- readAction
+    go samples = onReturnPressed $ do
+      t <- getTime Monotonic
 
-      case c of
-        Quit -> putStrLn (message (MsgGoodBye))
-        Ret -> do
-          t <- getTime Monotonic
+      let samples' = clipNumberOfSamples (sampleSize config) (clipOldSamples (resetTime config) (t:samples))
 
-          let samples' = clipNumberOfSamples (sampleSize config) (clipOldSamples (resetTime config) (t:samples))
+      case computeBPM samples' of
+        Nothing -> putStrLn (message (MsgHitMore))
+        Just bpm -> putStrLn (message (MsgTempo bpm (unrefine $ precision config)))
+      go samples'
 
-          case computeBPM samples' of
-            Nothing -> putStrLn (message (MsgHitMore))
-            Just bpm -> putStrLn (message (MsgTempo bpm (unrefine $ precision config)))
-          go samples'
+-- | execute the action if `<Return>` is pressed
+--   returns if `q` is pressed
+onReturnPressed :: IO () -> IO ()
+onReturnPressed action = do
+  c <- getChar
+  case c of
+    '\n' -> action
+    'q' -> pure ()
+    _ -> onReturnPressed action
+
 
 -- | If possible, returns the beat per minutes of this sample sequence
 computeBPM :: [TimeSpec] -> Maybe Float
