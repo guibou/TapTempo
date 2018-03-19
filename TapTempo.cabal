@@ -1,0 +1,14 @@
+name:                TapTempo
+version:             0.1
+license:             BSD3
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable TapTempo
+  main-is:             Main.hs
+  other-modules:       I18N, Model, TapTempo, Version
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+  build-depends:       base, optparse-applicative, refined, process, 
+                       clock, formatting, shakespeare, containers>=0.5.8, 
+                       template-haskell, text

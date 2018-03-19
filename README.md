@@ -9,14 +9,29 @@ Run it, press the `<Enter>` key, and see the beat per minute.
 
 # Build / Usage / Install
 
-Build using [nix](https://nixos.org/nix/) so:
+- Build using [nix](https://nixos.org/nix/):
 
 ```
 $ nix-build
 $ ./result/bin/TapTempo --help
+$ ./result/bin/TapTempo 
 ```
 
-Open a pull request if you want `cabal` / `stack` build script.
+- Run a `nix shell` + `cabal`:
+
+```
+$ nix-shell
+$ cabal run
+```
+
+- Build using [stack](https://haskellstack.org): install a recent version of stack, then
+
+```
+$ stack setup
+$ stack build
+$ stack exec TapTempo
+```
+
 
 # Limitations
 
@@ -30,3 +45,4 @@ The current localisation includes English and French, however some items are not
 - Using `optparse-applicative` and `refined`, the command line interface cannot accept an invalid input. The `Config` type, representing runtime configuration of the application, is full of refined types.
 - I had never localised an application before, and found [Text.Shakespeare.I18N](https://hackage.haskell.org/package/shakespeare-2.0.15/docs/Text-Shakespeare-I18N.html). It's doing the job really well.
 - The `--version` command line flags gives a version number using `git describe`, computed at compile time using template haskell. This is overkill and fun.
+
